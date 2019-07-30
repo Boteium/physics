@@ -1,0 +1,58 @@
+<head>
+  <script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
+</head>
+
+<body>
+  <div id="myDiv" style="height:90%;"></div>
+  <script>
+    var l = 1				// length of string
+    var theta = 10* (2*Math.PI/360)	// max angle
+    var g = 9.8				// gravity
+
+    var r = l*Math.sin(theta)			// radius of (virtual) circle
+    var T = 2 * Math.PI * Math.sqrt( l/g )	// period
+    var dt = T/100				// timestep
+    var dtheta = 2*Math.PI*dt/T			// delta theta of the (virtual) circle
+    var i = 0
+
+    var data = [{
+     x: [], y: [],
+     type: "scatter",
+    } ];
+
+    var layout = {
+      title: 'Simple Pendulum',
+      xaxis: { autorange: false, range: [-l,l] },
+      yaxis: { autorange: false, range: [-l/10,l] }
+    };
+
+    function compute(){
+      var x = r*Math.sin( i*dtheta )
+      data[0].x = [ x ]
+      data[0].y = [ l - l*Math.cos( Math.asin( x/l ) ) ]
+      i++
+    }
+
+    Plotly.plot('myDiv', data, layout, {showSendToCloud: true});
+
+    function update(){
+     setTimeout(function(){
+       compute()
+       Plotly.animate('myDiv', {
+          data
+        },{
+          transition: {
+            duration: 0,
+          },
+          frame: {
+            duration: 0,
+            redraw: false,
+          }
+        });
+        requestAnimationFrame(update);
+      }, 1000*dt);
+    }
+
+    requestAnimationFrame(update);
+  </script>
+</body>
